@@ -6,7 +6,7 @@ from .serializers import StockSerializer
 from rest_framework import generics
 from .serializers import RegisterSerializer
 from rest_framework.permissions import AllowAny
-from .services import get_stock_price, get_stock_price_at_date
+from .services import get_stock_price, get_stock_price_at_date, get_last_business_day
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -40,7 +40,8 @@ class StockViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def price_at_date(self, request, pk=None):
         ticker = Stock.objects.get(pk=pk, user=self.request.user)
-        date = ticker.add_date.strftime('%Y-%m-%d')
+        date = get_last_business_day(ticker.add_date)
+        date = date.strftime('%Y-%m-%d')
         price = get_stock_price_at_date(ticker.symbol, date)
 
         if price is None:

@@ -1,6 +1,8 @@
 import os
 import requests
 from dotenv import load_dotenv
+from datetime import timedelta
+
 
 
 load_dotenv()
@@ -13,6 +15,7 @@ def get_stock_price(symbol):
     try:
         response = requests.get(url)
         data = response.json()
+        print(data)
         price = float(data['Global Quote']['05. price'])
     except KeyError:
         return None
@@ -38,8 +41,18 @@ def get_stock_price_at_date(symbol, date):
         return price_at_end_of_day
 
 
+def get_last_business_day(date):
+    if date.weekday() == 5:
+        return date - timedelta(days=1)
+    elif date.weekday() == 6:
+        return date - timedelta(days=2)
+    else:
+        return date
+
+
+
 
 if __name__ == '__main__':
     
 
-    print(get_stock_price_at_date('AAPL', '2026-05-04'))
+    get_stock_price('AAPL')
